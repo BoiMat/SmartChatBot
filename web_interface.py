@@ -216,86 +216,72 @@ def main():
             height=100
         )
         
-        # Answer type selection
+        # --- IMPROVED: Single button, toggle for improved query ---
+        improve_query = st.checkbox(
+            "🔍 Improve Query (ask clarifying questions)",
+            value=False,
+            help="If checked, you will be asked clarifying questions before getting an answer."
+        )
+        
         if user_query.strip():
-            st.markdown("#### 🎯 How would you like to receive your answer?")
-            
-            col_direct, col_detailed = st.columns(2)
-            
-            with col_direct:
-                direct_answer = st.button(
-                    "� Get Direct Answer", 
-                    type="primary",
-                    help="Get an immediate answer based on your question as-is"
-                )
-            
-            with col_detailed:
-                detailed_answer = st.button(
-                    "🔍 Get Detailed Answer", 
-                    type="secondary",
-                    help="Answer clarifying questions first for a more targeted response"
-                )
-            
-            # Process direct answer
-            if direct_answer:
-                with st.spinner("Generating direct answer..."):
-                    try:
-                        answer_result = run_async(
-                            st.session_state.rag_system.generate_direct_answer(
-                                user_query,
-                                top_k
+            ask_button = st.button(
+                "🚀 Ask Question",
+                type="primary",
+                use_container_width=True
+            )
+            if ask_button:
+                if improve_query:
+                    with st.spinner("Analyzing your question to generate clarifying questions..."):
+                        try:
+                            analysis_result = run_async(
+                                st.session_state.rag_system.process_query(user_query, top_k)
                             )
-                        )
-                          # Display the direct answer
-                        st.markdown("### 📋 Research-Based Answer")
-                        st.markdown(
-                            f'<div class="answer-box">{answer_result["answer"]}</div>',
-                            unsafe_allow_html=True
-                        )
-                        
-                        # Add to conversation history
-                        st.session_state.conversation_history.append({
-                            'type': 'query',
-                            'content': user_query,
-                            'timestamp': str(len(st.session_state.conversation_history))
-                        })
-                        st.session_state.conversation_history.append({
-                            'type': 'answer',
-                            'content': answer_result["answer"],
-                            'improved_query': user_query,  # Same as original for direct answer
-                            'sources': answer_result.get('results', [])[:5]
-                        })
-                        
-                    except Exception as e:
-                        st.error(f"Error generating direct answer: {str(e)}")
-                        logger.error(f"Direct answer error: {e}")
-            
-            # Process detailed answer (with clarifying questions)
-            elif detailed_answer:
-                with st.spinner("Analyzing your question and retrieving relevant research..."):
-                    try:
-                        # Process the query
-                        analysis_result = run_async(
-                            st.session_state.rag_system.process_query(user_query, top_k)
-                        )
-                        st.session_state.analysis_result = analysis_result
-                        st.session_state.current_questions = analysis_result.get('questions', [])
-                        st.session_state.question_answers = {}  # Clear previous answers
-                        
-                        # Add to conversation history
-                        st.session_state.conversation_history.append({
-                            'type': 'query',
-                            'content': user_query,
-                            'timestamp': str(len(st.session_state.conversation_history))
-                        })
-                        st.success(f"Found {len(analysis_result.get('initial_results', []))} relevant documents!")
-                        
-                    except Exception as e:
-                        st.error(f"Error processing query: {str(e)}")
-                        logger.error(f"Query processing error: {e}")
+                            st.session_state.analysis_result = analysis_result
+                            st.session_state.current_questions = analysis_result.get('questions', [])
+                            st.session_state.question_answers = {}  # Clear previous answers
+                            st.session_state.conversation_history.append({
+                                'type': 'query',
+                                'content': user_query,
+                                'timestamp': str(len(st.session_state.conversation_history))
+                            })
+                            if st.session_state.current_questions:
+                                st.success(f"Generated {len(st.session_state.current_questions)} clarifying questions to improve your results!")
+                            else:
+                                st.info("No clarifying questions needed for this query. You can get a direct answer instead.")
+                        except Exception as e:
+                            st.error(f"Error analyzing query: {str(e)}")
+                            logger.error(f"Query analysis error: {e}")
+                else:
+                    with st.spinner("Generating answer..."):
+                        try:
+                            answer_result = run_async(
+                                st.session_state.rag_system.generate_direct_answer(
+                                    user_query,
+                                    top_k
+                                )
+                            )
+                            st.markdown("### 📋 Research-Based Answer")
+                            st.markdown(
+                                f'<div class="answer-box">{answer_result["answer"]}</div>',
+                                unsafe_allow_html=True
+                            )
+                            st.session_state.conversation_history.append({
+                                'type': 'query',
+                                'content': user_query,
+                                'timestamp': str(len(st.session_state.conversation_history))
+                            })
+                            st.session_state.conversation_history.append({
+                                'type': 'answer',
+                                'content': answer_result["answer"],
+                                'improved_query': user_query,  # Same as original for direct answer
+                                'sources': answer_result.get('results', [])[:5]
+                            })
+                        except Exception as e:
+                            st.error(f"Error generating answer: {str(e)}")
+                            logger.error(f"Direct answer error: {e}")
         else:
-            # Old single button (kept as fallback, but hidden)
-            st.empty()  # Placeholder to maintain layout
+            st.info("💡 **Tip:** Enter your question above, then click 'Ask Question' for a direct answer, or enable 'Improve Query' to refine your question first.")
+        # --- END IMPROVED ---
         
         # Display clarifying questions if available
         if st.session_state.current_questions:
