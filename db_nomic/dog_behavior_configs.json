@@ -1,0 +1,8 @@
+{
+    "db_path": "db_nomic",
+    "collection_name": "dog_behavior",
+    "embedding_model": "nomic-ai/nomic-embed-text-v1",
+    "chunk_size": 2,
+    "skip_duplicates": true,
+    "num_papers": 50
+}

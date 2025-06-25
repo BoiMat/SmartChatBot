@@ -1,0 +1,47 @@
+[project]
+name = "dog-behavior-rag"
+version = "0.1.0"
+description = "Interactive RAG system for dog behavior research with query refinement"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "beautifulsoup4>=4.13.4",
+    "chromadb>=1.0.13",
+    "einops>=0.8.1",
+    "huggingface-hub>=0.33.0",
+    "ipykernel>=6.29.5",
+    "jupyter>=1.1.1",
+    "langchain>=0.3.25",
+    "langchain-community>=0.3.25",
+    "nltk>=3.9.1",
+    "numpy>=2.2.6",
+    "ollama>=0.5.1",
+    "pandas>=2.3.0",
+    "plotly>=6.1.2",
+    "pydantic>=2.11.7",
+    "pypdf>=5.6.0",
+    "pypdf2>=3.0.1",
+    "pytest>=8.4.1",
+    "python-dotenv>=1.1.0",
+    "requests>=2.32.4",
+    "rich>=14.0.0",
+    "sentence-transformers>=4.1.0",
+    "streamlit>=1.46.0",
+    "torch",
+    "torchaudio",
+    "torchvision",
+    "unidecode>=1.4.0",
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu124", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchvision = [
+  { index = "pytorch-cu124", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
