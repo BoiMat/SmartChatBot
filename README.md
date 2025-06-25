@@ -10,7 +10,7 @@ An intelligent Retrieval-Augmented Generation (RAG) system specifically designed
 - **Semantic Search**: Uses advanced embedding models to find relevant papers based on meaning, not just keywords
 - **Academic Paper Database**: Stores and searches through academic papers with structured metadata
 
-## 🚀 What Makes This Special
+## What Makes This Special
 
 Unlike traditional RAG systems that simply return results for any query, this system:
 
@@ -19,7 +19,7 @@ Unlike traditional RAG systems that simply return results for any query, this sy
 3. **Asks Targeted Questions**: Generates specific follow-up questions to narrow down your search
 4. **Refines Search**: Uses your answers to create a more targeted query for better results
 
-## 📋 Example Interaction
+## Example Interaction
 
 ```
 User: "What causes aggression in dogs?"
@@ -46,7 +46,8 @@ Refined query: "aggression in dogs specifically about aggression and dominance i
 
 ### Prerequisites
 - Python 3.10+ installed
-- Ollama running locally with llama3.2:3b model:
+- uv installed
+- Ollama running locally with llama3.2:3b model (default):
   ```bash
   # Install Ollama (if not installed)
   # Then pull the required model:
